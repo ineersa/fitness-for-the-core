@@ -1,0 +1,60 @@
+services:
+  cli:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var
+      - ./_files:/data
+    depends_on:
+      - mysql
+    environment:
+      - DATABASE_URL=mysql://user:password@mysql:3306/excel_db
+    entrypoint: php console.php ${ARGS:-}
+    networks:
+      - app
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var
+    entrypoint: vendor/bin/phpunit ${ARGS:-}
+
+  composer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var
+      - ${HOME}/.config/composer:/root/.config/composer
+      - ${HOME}/.composer:/root/.composer
+    environment:
+      COMPOSER_ALLOW_SUPERUSER: 1
+    entrypoint: /usr/local/bin/composer ${ARGS:-}
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: excel_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "33333:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./_files:/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf
+    command: --local-infile=1
+    networks:
+      - app
+
+volumes:
+  mysql_data:
+
+networks:
+  app:
+    driver: bridge
