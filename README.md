@@ -110,6 +110,8 @@ LOAD DATA LOCAL INFILE completed. Total rows: 1000000, Execution time: 2.8261 se
 
 As we can see `2.8261` is quite faster than anything we did before, but if we combine it with CSV create time it will be on par with bulk insert with disabled keys
 
+## Bonus questions
+
 ```
 A bonus question 1: find the count of cells where the "column" has a duplicated letter. For example, "AA",
 "ABBD", "CCC" qualify. But "ABA" doesn't qualify because the As are not adjacent.
